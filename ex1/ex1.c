@@ -5,10 +5,10 @@
 #include <math.h>
 
 /*
-A funcao verifica se o numero n e primo, dividindo n por 2 ate sqrt(n). 
-Se nenhum numero de 2 ate sqrt(n) divide n,  entao n nao possui divisores menores ou iguais a raiz, 
-logo n nao possui nenhum divisor alem de 1 e n.
-Portanto, n e primo.
+A função verifica se o número n é primo, dividindo n por 2 até sqrt(n). 
+Se nenhum número de 2 até sqrt(n) divide n,  então n não possui divisores menores ou iguais a raiz, 
+logo n não possui nenhum divisor além de 1 e n.
+Portanto, n é primo.
 */
 int seriaPrimo(int n) {
     if (n < 2) return 0;
@@ -20,7 +20,10 @@ int seriaPrimo(int n) {
     return 1;
 }
 
-// A funcao procura um divisor i de n e depois divide n por i para obter um segundo fator j, depois verifica se ambos sao primos.
+/*
+A função procura um divisor i de n e depois divide n por i para obter um segundo fator j
+depois verifica se ambos são primos.
+*/
 int seriaPP(int n) {
     for (int i = 2; i <= sqrt(n); i++) {
         if (n % i == 0){
@@ -33,8 +36,10 @@ int seriaPP(int n) {
             else return 0;
         }
     }
+    return 0;
 }
 
+// Algoritmo de Euclides para máximo divisor comum
 int mdcEuclides(int a, int b) {
     if (b == 0) {
         return a;
@@ -43,12 +48,17 @@ int mdcEuclides(int a, int b) {
     return mdcEuclides(b, a % b);
 }
 
-// A funcao e a funcao de geracao, ela foi implementada como funcao para facilitar a legibilidade do codigo
+//Função de geração g(x) = x^2 + 1 , ela foi implementada como função para facilitar a legibilidade do código
 int g(int x, int y){
     long long s = ((1LL * x * x) + 1) % y;
     return s;
 }
 
+/*
+Implementação do Pollard Rho com semente x0 = 2 e função g(x)
+Imprime cada iteração (x1, x2, mdc(|x1-x2|, n))
+Retorna um fator não trivial ou -1 se falhar (d == n) 
+*/
 int rhoPollard(int n) {
     if(n % 2 == 0) return 2;
 
@@ -67,7 +77,7 @@ int rhoPollard(int n) {
             int x = abs(x1 - x2);
 
             d = mdcEuclides(x, n);
-            printf("# Interacao %d\n", i);
+            printf("# Interacão %d\n", i);
             printf("# x1 = %d, x2 = %d \n# mdc(%d, %d) = %d\n\n", x1, x2, x, n, d);
             i++;
         }
@@ -78,18 +88,22 @@ int rhoPollard(int n) {
     } 
 }
 
-int expP (int n, int z) {
+// Gera o menor expoente público e tal que 1 < e < n e mdc(e, z)=1.
+int expPub (int n, int z) {
     int e;
     
     for (e = 2; e < n; e++) {
         if (mdcEuclides(e, z) == 1) {
             return e;
-        }
-        
+        } 
     }
-
 }
 
+/*
+Algoritimo de Euclides extendido
+retorna mdc(a, b) na qual satisfaz a*x + b*y = mdc (a, b), encontrando os valores de x e y
+o uso de ponteiros é necessário pois a função precisava retornar mais de um valor sendo eles: x, y e o mdc
+*/
 int euclidesEXT(int a, int b, int *x, int *y) {
     if (a == 0) {
         *x = 0;
@@ -106,6 +120,8 @@ int euclidesEXT(int a, int b, int *x, int *y) {
     return m;
 }
 
+// calcula o inverso modular de e mod z para obter d, tal que d*e ≡ 1 mod z.
+// retorna -1 se não existir
 int invrs_mod (int e, int z) {
     int x, y;
 
@@ -113,30 +129,40 @@ int invrs_mod (int e, int z) {
         return -1;
     }
 
-    return (x % z + z) % z; // essa parte garante que d nao e negativo
+    return (x % z + z) % z; // essa parte garante que d não é negativo no intervalo de [0, z-1]
 }
 
-int modEXP (int m, int e, int n) {
+// exponenciacão modular simples, retorna m^e mod n
+int modEXPsimple (int m, int e, int n) {
     int r = 1;
     m = m % n;
 
-    printf("\n # Calculo de %d^%d mod %d:\n", m, e, n);
-
     while (e > 0) {
-        printf("e = %d | m = %d | resultado = %d\n", e, m, r);
-
         if (e % 2 == 1) {
             r = (r * m) % n;
-            printf(" - Multiplica: resultado = %d\n", r);
         }
-
         e = e / 2;
         m = (m * m) % n;
-        printf(" - Eleva m^2 mod %d = %d\n\n", n, m);
+
     }
 
     return r;
 }
+
+// totiente de Eulerr phi(n), fatoração por tentativa
+int phiEuler(int n) {
+    int r = n;
+
+    for(int i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            while (n % i == 0) (n /= i);
+            r -= r / i;
+        }
+    }
+    if (n > 1) (r -= r / n);
+
+    return r;
+} 
 
 int main () {
     int N1, N2;
@@ -144,11 +170,11 @@ int main () {
     int valid2 = 0;
 
     printf("\nExercicio 1\nFeito por Maria Clara Canuto Gontijo - 232005352\n");
-    printf("\nInsira dois numeros inteiros, N1 e N2, com cada numero contendo de 3 a 4 digitos.\nObs.: Cada Ni deve ser o produto de primos distintos para que o Metodo Pollard Rho seja efetivo.\n");
+    printf("\nInsira dois numeros inteiros, N1 e N2, com cada numero contendo de 3 a 4 dígitos.\nObs.: Cada Ni deve ser o produto de primos distintos para que o Método Pollard Rho seja efetivo.\n");
     printf("\n1) Fatoracao Iterativa\n\n");
 
 
-//verificao de restricao n1 e n2
+    //entradas iniciais e verificao de restricao n1 e n2 -----------------------'''''''
     printf("# Entrada de Dados\n");
 
     while (!valid1) { 
@@ -173,7 +199,7 @@ int main () {
             }
 
             else {
-                printf("Numero Invalido, tente novamente.\n\n");
+                printf("Numero Inválido, tente novamente.\n\n");
             }
         }
     }
@@ -206,8 +232,7 @@ int main () {
         }
     }
 
-// pollard rho. Adicione uma explicacao aqui
-
+    // Pollard Rrho para N1 e N2 --------------------------------------
     printf("# Implementacao do Metodo Rho de Pollard\n\n");
 
     int p, q;
@@ -235,10 +260,11 @@ int main () {
         exit(EXIT_FAILURE);
     }
 
-    printf("\n# Identificacao dos primos RSA\n");
-    printf("\np = %d\nq = %d\n", p, q);
-    printf("\n2) Geracao das chaves RSA\n");
+    printf("# Identificacao dos primos RSA\n");
+    printf("p = %d\nq = %d\n", p, q);
 
+    // geracão das chaves RSA -----------------------------
+    printf("\n2) Geracao das chaves RSA\n");
     int n = p * q;
     printf("\n# Calculo do modulo\n");
     printf("n = %d * %d = %d\n", p, q, n);
@@ -249,7 +275,7 @@ int main () {
 
     int e;
 
-    e = expP(n, z);
+    e = expPub(n, z);
 
     printf("\n# Escolha do expoente publico\n");
     printf("# Precisa-se escolher o menor E > 1 e E < n tal que mdc (E, z(n))=1\n");
@@ -261,19 +287,18 @@ int main () {
 
     printf("# Assim se obtem as chaves:\n# chave publica: (%d, %d)\n# chave privada: (%d, %d)\n\n", n, e, n, D);
  
-    // criptografia
-
-
-    printf("3) Criptografia e Descriptografia\n\n");
+    // criptografia --------------------------------
+    printf("3) Criptografia\n\n");
 
     char msg[200];
     int m[400];
     int count = 0;
-    int cod[400];
+    int c[400];
 
     printf("Digite uma mensagem de ate 200 digitos, pressione Enter para continuar: ");
     scanf(" %[^\n]", msg);
 
+    // pre codificacão ------------------
     printf("\n# Mensagem pre-codificada:\n");
     for (int i = 0; msg[i] != '\0'; i++) {
         char c = tolower(msg[i]);
@@ -288,23 +313,143 @@ int main () {
             m[count++] = pcod;
         }
     }
+
     printf("\nTotal de blocos (m): %d", count);
 
-    printf("\n\n# Para codificar usando RSA, cada bloco m formado pelos numeros da mensagem, faz-se C ≡ M^e mod n\n");
+    // codificacão ------------------------------------
+    printf("\n\n# Para codificar usando RSA, faz-se C congruente a M^e mod n para cada bloco m formado pelos números da mensagem.\n");
+    printf("# E para isso, eh necessario reduzir o expoente utilizando um dos 3 teoremas de reducão de expoente: Fermat, Euler e Divisão Euclidiana.\n\n");
+    
 
-    for (int i = 0; i < count; i++) {
-        int M = m[i];
-        printf("\nBloco %02d - M = %d", i + 1, M);
+    for (int i = 0; i < count ; i++){
+        int newE = e;
 
-        cod[i] = modEXP(M, e, n);
-        printf("C = %d\n", cod[i]);
+        printf("# Bloco %02d => M = %02d\n", i + 1, m[i]);
+
+        if (seriaPrimo(n)) {
+            newE = e % (n - 1);
+
+            printf("\n- Vamos usar o [ Pequeno Teorema de Fermat ] para esse caso, pois:\n");
+            printf("- n = %d eh primo e isso confere as restricoes do teorema. Entao faz-se E mod (n - 1).");
+            printf("- E mod (n - 1) = %d mod %d = %d\n", e, n - 1, newE);
+        }
+
+        else if (mdcEuclides(m[i], n) == 1) {
+            int phi = phiEuler(n);
+            newE = e % phi;
+
+            printf("\n- Vamos usar o [ Teorema de Euler ] para esse caso, pois:\n");
+            printf("- n = %d nao eh primo e mdc(m, n) = 1, conferindo com as restricoes do teorema. Entao faz-se E mod phi(n).\n");
+            printf("- phi(%d) = %d\n", n, phi);
+            printf("- E mod phi(n) = %d mod %d = %d\n", e, phi, newE);
+        }
+
+        else {
+            newE = e % n;
+
+            printf("\n- Vamos usar o [ Teorema da Divisao Euclidiana ] para esse caso, pois:\n");
+            printf("- Já que n = %d nao eh primo e mdc(m, n) != 1, por eliminacao, este teorema e escolhido. Entao faz-se E mod n.\n");
+            printf("- E mod n = %d mod %d = %d\n", e, n, newE);
+        }
+        
+        printf("- Faz-se C_i = %d^%d mod %d\n", m[i], newE, n);
+        c[i] = modEXPsimple(m[i], newE, n);
+        printf("C_%d = %d\n\n", i + 1, c[i]);
     }
 
-    printf("\n# Mensagem Criptografada (vetor C):\n[ ");
+    printf("# Mensagem codificada (vetor C):\n[ ");
     for (int i = 0; i < count; i++) {
-        printf("%d ", cod[i]);
+        printf("%d ", c[i]);
     }
-    printf("]\n");
+    printf("]\n\n");
+
+    printf("4) Descriptografia\n\n");
+
+    printf("# Para decodificar, faz-se M congruente a C^D mod n para cada bloco c cifrado.\n");
+    printf("# E para isso, eh necessario reduzir o expoente utilizando um dos 3 teoremas de reducao de expoente: Fermat, Euler e Divisao Euclidiana.\n\n");
+
+    for (int i = 0; i < count ; i++){
+        int newD = D;
+
+        printf("# Bloco %02d => C = %02d\n", i + 1, c[i]);
+
+        if (seriaPrimo(n)) {
+            newD = D % (n - 1);
+
+            printf("\n- Vamos usar o [ Pequeno Teorema de Fermat ] para esse caso, pois:\n");
+            printf("- n = %d eh primo e isso confere as restricoes do teorema. Entao faz-se E mod (n - 1).");
+            printf("- E mod (n - 1) = %d mod %d = %d\n", D, n - 1, newD);
+        }
+
+        else if (mdcEuclides(m[i], n) == 1) {
+            int phi = phiEuler(n);
+            newD = D % phi;
+
+            printf("\n- Vamos usar o [ Teorema de Euler ] para esse caso, pois:\n");
+            printf("- n = %d nao eh primo e mdc(m, n) = 1, conferindo com as restricoes do teorema. Entao faz-se E mod phi(n).\n");
+            printf("- phi(%d) = %d\n", n, phi);
+            printf("- E mod phi(n) = %d mod %d = %d\n", D, phi, newD);
+        }
+
+        else {
+            newD = D % n;
+
+            printf("\n- Vamos usar o [ Teorema da Divisao Euclidiana ] para esse caso, pois:\n");
+            printf("- Ja que n = %d nao eh primo e mdc(m, n) != 1, por eliminacao, este teorema e escolhido. Entao faz-se E mod n.\n");
+            printf("- E mod n = %d mod %d = %d\n", D, n, newD);
+        }
+        
+        printf("- Faz-se M_i = %d^%d mod %d\n", c[i], newD, n);
+        m[i] = modEXPsimple(c[i], newD, n);
+        printf("M_%d = %d\n\n", i + 1, m[i]);
+    }
+
+    printf("# Mensagem QUASE Decodificada (vetor M):\n[ ");
+    for (int i = 0; i < count; i++) {
+        printf("%d ", m[i]);
+    }
+    printf("]\n\n");
+
+    printf("# E finalmente, eh necessario converter os numeros em letras novamente.\n");
+
+    char msg_dec[100];
+    int pos = 0;
+    for (int i = 0; i < count; i++) {
+        if (m[i] == 0)
+            msg_dec[pos++] = ' ';
+
+        else if (m[i] >= 11 && m[i] <= 36)
+            msg_dec[pos++] = (char)('a' + (m[i] - 11));
+    }
+    msg_dec[pos] = '\0';
+
+    printf("# Mensagem decodificada: %s\n", msg_dec);
+
+    printf("\n");
+
+    printf("# Confirmacao de equivalencia entre original e decodificada:\n");
+    printf("-> Original (normalizada para minusculas e sem pontuacao): ");
+
+    char original_norm[400];
+    int p2 = 0;
+
+    for (int i = 0; msg[i] != '\0'; i++) {
+        char cc = tolower((unsigned char)msg[i]);
+        if (cc == ' ' || (cc >= 'a' && cc <= 'z')) {
+            original_norm[p2++] = cc;
+        }
+    }
+    original_norm[p2] = '\0';
+
+    printf("%s\n", original_norm);
+    printf("-> Mensagem Decodificada: %s\n", msg_dec);
+
+    if (strcmp(original_norm, msg_dec) == 0) {
+        printf("\nMensagem decodificada eh IDENTICA a mensagem original (apos normalizacao).\n");
+    } else {
+        printf("\nMensagem decodificada eh DIFERENTE da original (apos normalizacao).\n");
+        printf("Verifique pontuacao, acentos ou caracteres ignorados na pre-codificacao.\n");
+    }
 
     return 0;
 }
