@@ -1,3 +1,10 @@
+/*
+Questão 1
+Sistema RSA com Fatoração ρ de Pollard e
+Aplicação de Teoremas Modulares em Três Etapas
+Aluna: Maria Clara Canuto Gontijo - 232005352
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -179,7 +186,7 @@ int main () {
 
     while (!valid1) { 
         printf("Digite N1, pressione Enter para confirmar: ");
-        if (scanf("%d", &N1) != 1) {
+        if (scanf(" %d", &N1) != 1) {
             int c;
             while ((c = getchar()) != '\n' && c != EOF);
             printf("Numero Invalido, tente novamente.\n\n");
@@ -207,7 +214,7 @@ int main () {
 
     while (!valid2) { 
         printf("Digite N2, pressione Enter para confirmar: ");
-        if (scanf("%d", &N2) != 1) {
+        if (scanf(" %d", &N2) != 1) {
             int c;
             while ((c = getchar()) != '\n' && c != EOF);
             printf("Numero Invalido, tente novamente.\n\n");
